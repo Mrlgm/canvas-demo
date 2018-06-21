@@ -3,7 +3,7 @@ var context = canvas.getContext('2d');
 
 autoSetCanvasSize(canvas)
 
-listenToMouse(canvas)
+listenToUser(canvas)
 
 /*********************/
 
@@ -57,7 +57,7 @@ function autoSetCanvasSize() {
     }
 }
 
-function listenToMouse(canvas) {
+function listenToUser(canvas) {
 
 
     var using = false
@@ -65,44 +65,88 @@ function listenToMouse(canvas) {
         x: undefined,
         y: undefined
     }
-    canvas.onmousedown = function (a) {
-        var x = a.clientX
-        var y = a.clientY
-        using = true
-        if (eraserEnabled) {
-            context.clearRect(x - 5, y - 5, 10, 10)
-        } else {
-            lastPaint = {
-                x: x,
-                y: y
+    if (document.body.ontouchstart !== undefined) {
+        //触屏设备
+        canvas.ontouchstart = function (a) {
+            var x = a.touches[0].clientX
+            var y = a.touches[0].clientY
+            using = true
+            if (eraserEnabled) {
+                context.clearRect(x - 5, y - 5, 10, 10)
+            } else {
+                lastPaint = {
+                    x: x,
+                    y: y
+                }
+                //drawCircle(x, y, 1)
             }
-            //drawCircle(x, y, 1)
         }
-    }
 
-    canvas.onmousemove = function (a) {
-        var x = a.clientX
-        var y = a.clientY
-        if (!using) {
-            return
-        }
-        if (eraserEnabled) {
-            context.clearRect(x - 5, y - 5, 10, 10)
-        } else {
-            var newPaint = {
-                x: x,
-                y: y
+        canvas.ontouchmove = function (a) {
+            var x = a.touches[0].clientX
+            var y = a.touches[0].clientY
+            if (!using) {
+                return
             }
-            //drawCircle(x, y, 1)
-            drawLiine(lastPaint.x, lastPaint.y, newPaint.x, newPaint.y)
-            lastPaint = newPaint
+            if (eraserEnabled) {
+                context.clearRect(x - 5, y - 5, 10, 10)
+            } else {
+                var newPaint = {
+                    x: x,
+                    y: y
+                }
+                //drawCircle(x, y, 1)
+                drawLiine(lastPaint.x, lastPaint.y, newPaint.x, newPaint.y)
+                lastPaint = newPaint
+            }
+
         }
 
+        canvas.ontouchend = function (a) {
+            using = false
+        }
+
+    } else {
+        //非触屏设备
+        canvas.onmousedown = function (a) {
+            var x = a.clientX
+            var y = a.clientY
+            using = true
+            if (eraserEnabled) {
+                context.clearRect(x - 5, y - 5, 10, 10)
+            } else {
+                lastPaint = {
+                    x: x,
+                    y: y
+                }
+                //drawCircle(x, y, 1)
+            }
+        }
+
+        canvas.onmousemove = function (a) {
+            var x = a.clientX
+            var y = a.clientY
+            if (!using) {
+                return
+            }
+            if (eraserEnabled) {
+                context.clearRect(x - 5, y - 5, 10, 10)
+            } else {
+                var newPaint = {
+                    x: x,
+                    y: y
+                }
+                //drawCircle(x, y, 1)
+                drawLiine(lastPaint.x, lastPaint.y, newPaint.x, newPaint.y)
+                lastPaint = newPaint
+            }
+
+        }
+
+        canvas.onmouseup = function (a) {
+            using = false
+        }
     }
 
-    canvas.onmouseup = function (a) {
-        using = false
-    }
+
 }
-
-
